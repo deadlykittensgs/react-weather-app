@@ -37,7 +37,30 @@ function App() {
     getWeatherData(locationOfSearch)
   };
 
+  function kelvinToFahrenheit(kelvin) {
+    // Convert Kelvin to Celsius
+    let celsius = kelvin - 273.15;
+    // Convert Celsius to Fahrenheit
+    let fahrenheit = (celsius * (9/5) + 32);
+    return Math.floor(fahrenheit)
+  }
 
+
+  function convertUnixToLocal(unixTimestamp) {
+    // Create a Date object from the Unix timestamp (multiply by 1000 to convert seconds to milliseconds)
+    const date = new Date(unixTimestamp * 1000);
+
+    // Convert to local time string
+    const localTimeString = date.toLocaleString();
+
+    return localTimeString;
+}
+
+// this is using the timezone on your local device this will need to be fixed
+  
+
+
+  
 
 
 async function getWeatherData(city) {
@@ -55,28 +78,23 @@ if (!response.ok) {
 // if valid information is returned 
 let apiInformation = await response.json()
 
-// give use state information
+// give use state information to set
 setWeatherArray(apiInformation)
-console.log(weatherArray)
-changeDom()
+setWeather(kelvinToFahrenheit(apiInformation.main.temp))
+setDailyMin(kelvinToFahrenheit(apiInformation.main.temp_min))
+setDailyMax(kelvinToFahrenheit(apiInformation.main.temp_max))
+setDescription(apiInformation.weather[0].description) 
+setHumidity(apiInformation.main.humidity)
+setVisibility(apiInformation.visibility)
+setWindspeed(apiInformation.wind.speed)
+setWindDirection(apiInformation.wind.deg)
+setSunrise(convertUnixToLocal(apiInformation.sys.sunrise))
+setSunset(convertUnixToLocal(apiInformation.sys.sunset))
+setFeelsLike(kelvinToFahrenheit(apiInformation.main.feels_like))
+setPressure(apiInformation.main.pressure)
 
-}
-
-function changeDom() {
-  setWeather(weatherArray.main.temp )
-  setDailyMin(weatherArray.main.temp_min)
-  setDailyMax(weatherArray.main.temp_max)
-  setDescription(weatherArray.weather[0].description) 
-  setHumidity(weatherArray.main.pressure)
-  setVisibility(weatherArray.visibility)
-  setWindspeed(weatherArray.wind.speed)
-  setWindDirection(weatherArray.wind.deg)
-  setSunrise(weatherArray.sys.sunrise)
-  setSunset(weatherArray.sys.sunset)
-  setFeelsLike(weatherArray.main.feels_like)
-  setPressure(weatherArray.main.pressure)
-  // set description for some reason it will only set as an object 
-  
+console.log(apiInformation)
+console.log(kelvinToFahrenheit(apiInformation.main.temp))
 }
 
 
@@ -106,7 +124,7 @@ function changeDom() {
         <div>{description}</div>
         <i className="fa-solid fa-sun"></i>
         <div className='text-[4rem]'>{weather}' </div>
-        <div>H:{dailyMax} L:{dailyMin} </div>
+        <div>H:{dailyMax}' L:{dailyMin}' </div>
 
       </div>
       
