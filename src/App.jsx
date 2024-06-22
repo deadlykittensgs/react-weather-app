@@ -1,22 +1,20 @@
 import { useState } from 'react'
 import './App.css'
-import Hours from './components/Hours'
-import Days from './components/Days'
+import Stats from './components/Stats'
 
 function App() {
 
-
-
   let result = ""
   let emojiChoice = ""
-  const [emoji, setEmoji] = useState("sun")
-  const [city, setCity] = useState('Oklahoma city')
-  const [description, setDescription] = useState("Sunny")
-  const [dailyMin, setDailyMin] = useState("min")
-  const [dailyMax, setDailyMax] = useState("max")
+
+  const [emoji, setEmoji] = useState("")
+  const [city, setCity] = useState('')
+  const [description, setDescription] = useState("")
+  const [dailyMin, setDailyMin] = useState("")
+  const [dailyMax, setDailyMax] = useState("")
   const [weatherArray, setWeatherArray] = useState("")
   const [inputValue, setInputValue] = useState('');
-  const [weather, setWeather] = useState(0)
+  const [weather, setWeather] = useState()
   const [humidity, setHumidity] = useState(0)
   const [visibility, setVisibility] = useState(0)
   const [windspeed, setWindspeed] = useState(0)
@@ -27,18 +25,16 @@ function App() {
   const [pressure, setPressure] = useState(0)
   const apiKey ="37c2c16aaa0dc6e405e59110c9fe7c67";
 
- //  step 1 add use states to put information in 
 
-  // Step 2: Handle input change and update the state
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
   };
 
-  // Step 3: Handle click event and store the input value
   const handleClick = () => {
     let locationOfSearch = inputValue.toLocaleLowerCase()
     getWeatherData(locationOfSearch)
   };
+
 
   function kelvinToFahrenheit(kelvin) {
     // Convert Kelvin to Celsius
@@ -48,18 +44,6 @@ function App() {
     return Math.floor(fahrenheit)
   }
 
-//   function convertUnixToLocal(unixTimestamp) {
-//     // Create a Date object from the Unix timestamp (multiply by 1000 to convert seconds to milliseconds)
-//     const date = new Date(unixTimestamp * 1000);
-
-//     // Convert to local time string
-//     const localTimeString = date.toLocaleString();
-
-//     return localTimeString;
-// }
-
-// this is using the timezone on your local device this will need to be fixed
-  
 
 function degToCompass(num) {
   var val = Math.floor((num / 22.5) + 0.5);
@@ -104,11 +88,68 @@ function fixEmoji(emoji) {
   if (emoji >= 801 && emoji < 810) {
     emojiChoice = <i className="fa-solid fa-cloud"></i>
   }
-  // else if {
-  //   emojiChoice = "?"
-  // }
    return emojiChoice
 }
+
+
+async function getLocation() {
+  if (!navigator.geolocation) {
+    console.error(`Your browser doesn't support Geolocation`);
+}
+  await    navigator.geolocation.getCurrentPosition(onSuccess, onError)
+
+}
+
+function onSuccess(position) {
+  const {
+      latitude,
+      longitude
+  } = position.coords;
+
+ console.log(`Your location: (${latitude},${longitude})`)
+ getWeatherDataByCords(longitude, latitude)
+}
+
+function onError() {
+  message.classList.add('error');
+  message.textContent = `Failed to get your location!`;
+}
+
+
+async function getWeatherDataByCords(lon, lat) {
+  
+  console.log(lon)
+  console.log(lat)
+  const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}`
+  const response = await fetch(apiUrl)
+
+
+// check to see if response is ok
+if (!response.ok) {
+  console.log("fetch fail")
+  throw new Error("could not fetch weather Data")
+}
+
+// if valid information is returned 
+let apiInformation = await response.json()
+
+// give use state information to set
+setEmoji( fixEmoji(apiInformation.weather[0].id))
+setCity(apiInformation.name)
+setWeatherArray(apiInformation)
+setWeather(kelvinToFahrenheit(apiInformation.main.temp)+"'")
+setDailyMin("L:" + kelvinToFahrenheit(apiInformation.main.temp_min)+"'")
+setDailyMax("H:" + kelvinToFahrenheit(apiInformation.main.temp_max)+ "'")
+setDescription(apiInformation.weather[0].description) 
+setHumidity(apiInformation.main.humidity)
+setVisibility(fixVisibility(apiInformation.visibility))
+setWindspeed(toMph(apiInformation.wind.speed))
+setWindDirection(degToCompass(apiInformation.wind.deg))
+setFeelsLike(kelvinToFahrenheit(apiInformation.main.feels_like))
+setPressure(apiInformation.main.pressure)
+}
+
+
 
 
 
@@ -129,12 +170,11 @@ let apiInformation = await response.json()
 
 // give use state information to set
 setEmoji( fixEmoji(apiInformation.weather[0].id))
-console.log(apiInformation.weather[0].id)
 setCity(apiInformation.name)
 setWeatherArray(apiInformation)
-setWeather(kelvinToFahrenheit(apiInformation.main.temp))
-setDailyMin(kelvinToFahrenheit(apiInformation.main.temp_min))
-setDailyMax(kelvinToFahrenheit(apiInformation.main.temp_max))
+setWeather(kelvinToFahrenheit(apiInformation.main.temp)+"'")
+setDailyMin("L:" + kelvinToFahrenheit(apiInformation.main.temp_min)+"'")
+setDailyMax("H:" + kelvinToFahrenheit(apiInformation.main.temp_max)+ "'")
 setDescription(apiInformation.weather[0].description) 
 setHumidity(apiInformation.main.humidity)
 setVisibility(fixVisibility(apiInformation.visibility))
@@ -142,9 +182,6 @@ setWindspeed(toMph(apiInformation.wind.speed))
 setWindDirection(degToCompass(apiInformation.wind.deg))
 setFeelsLike(kelvinToFahrenheit(apiInformation.main.feels_like))
 setPressure(apiInformation.main.pressure)
-
-console.log(apiInformation)
-console.log(kelvinToFahrenheit(apiInformation.main.temp))
 }
 
 
@@ -160,11 +197,10 @@ console.log(kelvinToFahrenheit(apiInformation.main.temp))
     // html
     <section className='w-screen h-screen'>
       {/* header section  */}
-    <header className='flex bg-blue-400 align-center justify-between p-3'>
+    <header className='flex bg-blue-400 align-center justify-center p-3'>
       
-      <p>1/1/34</p>
-      <p>The Weather App</p>
-      <p><i className="fa-solid fa-sun"></i></p>
+   
+      <p>Todays Weather</p>
     </header>
 
 {/* body */}
@@ -173,16 +209,15 @@ console.log(kelvinToFahrenheit(apiInformation.main.temp))
       <h1 className='text-xl'>{city}</h1>
         <div>{description}</div>
         <div>{emoji}</div>
-        <div className='text-[4rem]'>{weather}' </div>
-        <div>H:{dailyMax}' L:{dailyMin}' </div>
+        <div className='text-[4rem]'>{weather} </div>
+        <div>{dailyMax} {dailyMin} </div>
 
       </div>
       
 
         <div className=' flex flex-col justify-between w-4/5 h-2/5 bg-slate-100/30 overflow-auto p-3'>
-      <Hours setVisibility={setVisibility} windDirection={windDirection}  humidity={humidity} visibility={visibility} windspeed={windspeed} sunrise={sunrise} sunset={sunset} feelsLike={feelsLike} pressure={pressure} />
+      <Stats setVisibility={setVisibility} windDirection={windDirection}  humidity={humidity} visibility={visibility} windspeed={windspeed} sunrise={sunrise} sunset={sunset} feelsLike={feelsLike} pressure={pressure} />
         </div>
-        <p className='text-blue-500 text-sm'> <i className="fa-solid fa-arrow-left"></i> scroll <i className="fa-solid fa-arrow-right"></i> </p>
 
    
   <div> 
@@ -190,7 +225,7 @@ console.log(kelvinToFahrenheit(apiInformation.main.temp))
     <div>
     <input id='locationInput' type="text" value={inputValue}  onChange={handleInputChange} placeholder='enter your location here'/>
     <button onClick={handleClick} className=' bg-slate-300 p-1 rounded m-2'>Search</button>
-<button className=' bg-slate-300 p-1 rounded m-2'><i className="fa-solid fa-crosshairs"></i></button>
+<button onClick={getLocation} className=' bg-slate-300 p-1 rounded m-2'><i className="fa-solid fa-crosshairs"></i></button>
     </div>
     
 
