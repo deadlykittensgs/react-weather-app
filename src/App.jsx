@@ -7,13 +7,16 @@ function App() {
 
 
 
-
-  const [description, setDescription] = useState("sunny")
+  let result = ""
+  let emojiChoice = ""
+  const [emoji, setEmoji] = useState("sun")
+  const [city, setCity] = useState('Oklahoma city')
+  const [description, setDescription] = useState("Sunny")
   const [dailyMin, setDailyMin] = useState("min")
   const [dailyMax, setDailyMax] = useState("max")
   const [weatherArray, setWeatherArray] = useState("")
   const [inputValue, setInputValue] = useState('');
-  const [weather, setWeather] = useState(60)
+  const [weather, setWeather] = useState(0)
   const [humidity, setHumidity] = useState(0)
   const [visibility, setVisibility] = useState(0)
   const [windspeed, setWindspeed] = useState(0)
@@ -45,22 +48,68 @@ function App() {
     return Math.floor(fahrenheit)
   }
 
+//   function convertUnixToLocal(unixTimestamp) {
+//     // Create a Date object from the Unix timestamp (multiply by 1000 to convert seconds to milliseconds)
+//     const date = new Date(unixTimestamp * 1000);
 
-  function convertUnixToLocal(unixTimestamp) {
-    // Create a Date object from the Unix timestamp (multiply by 1000 to convert seconds to milliseconds)
-    const date = new Date(unixTimestamp * 1000);
+//     // Convert to local time string
+//     const localTimeString = date.toLocaleString();
 
-    // Convert to local time string
-    const localTimeString = date.toLocaleString();
-
-    return localTimeString;
-}
+//     return localTimeString;
+// }
 
 // this is using the timezone on your local device this will need to be fixed
   
 
+function degToCompass(num) {
+  var val = Math.floor((num / 22.5) + 0.5);
+  var arr = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
+  return arr[(val % 16)];
+}
 
+function toMph(num) {
+  let answer = num * 2.2369363
+  return Math.floor(answer)
+}
+
+
+function fixVisibility(vis) {
+if (vis > 700) {
+  result = "High"
+}
+if (vis > 400 && vis < 700) {
+result = "Average"
+}
+if (vis < 400) {
+  result = "Low"
+}
+
+return result
+}
   
+
+function fixEmoji(emoji) {
+  if (emoji >= 200 && emoji < 600) {
+    emojiChoice = <i className="fa-solid fa-cloud-rain"></i>
+  }
+  if (emoji >= 600 && emoji < 700) {
+    emojiChoice = <i className="fa-solid fa-snowflake"></i>
+  }
+  if (emoji >= 700 && emoji < 800) {
+    emojiChoice = <i className="fa-solid fa-smog"></i>
+  }
+  if (emoji === 800) {
+    emojiChoice = <i className="fa-regular fa-sun"></i>
+  }
+  if (emoji >= 801 && emoji < 810) {
+    emojiChoice = <i className="fa-solid fa-cloud"></i>
+  }
+  // else if {
+  //   emojiChoice = "?"
+  // }
+   return emojiChoice
+}
+
 
 
 async function getWeatherData(city) {
@@ -79,17 +128,18 @@ if (!response.ok) {
 let apiInformation = await response.json()
 
 // give use state information to set
+setEmoji( fixEmoji(apiInformation.weather[0].id))
+console.log(apiInformation.weather[0].id)
+setCity(apiInformation.name)
 setWeatherArray(apiInformation)
 setWeather(kelvinToFahrenheit(apiInformation.main.temp))
 setDailyMin(kelvinToFahrenheit(apiInformation.main.temp_min))
 setDailyMax(kelvinToFahrenheit(apiInformation.main.temp_max))
 setDescription(apiInformation.weather[0].description) 
 setHumidity(apiInformation.main.humidity)
-setVisibility(apiInformation.visibility)
-setWindspeed(apiInformation.wind.speed)
-setWindDirection(apiInformation.wind.deg)
-setSunrise(convertUnixToLocal(apiInformation.sys.sunrise))
-setSunset(convertUnixToLocal(apiInformation.sys.sunset))
+setVisibility(fixVisibility(apiInformation.visibility))
+setWindspeed(toMph(apiInformation.wind.speed))
+setWindDirection(degToCompass(apiInformation.wind.deg))
 setFeelsLike(kelvinToFahrenheit(apiInformation.main.feels_like))
 setPressure(apiInformation.main.pressure)
 
@@ -114,30 +164,27 @@ console.log(kelvinToFahrenheit(apiInformation.main.temp))
       
       <p>1/1/34</p>
       <p>The Weather App</p>
-      <p>sun</p>
+      <p><i className="fa-solid fa-sun"></i></p>
     </header>
 
 {/* body */}
     <div className='flex flex-col h-full items-center bg-sunny-day bg-cover bg-no-repeat bg-center '>
       <div className='flex flex-col items-center p-10'>
-      <h1 className='text-xl'>Oklahoma City</h1>
+      <h1 className='text-xl'>{city}</h1>
         <div>{description}</div>
-        <i className="fa-solid fa-sun"></i>
+        <div>{emoji}</div>
         <div className='text-[4rem]'>{weather}' </div>
         <div>H:{dailyMax}' L:{dailyMin}' </div>
 
       </div>
       
 
-        <div className=' bg-slate-200/50 flex overflow-auto gap-10 w-full'>
-      <Hours windDirection={windDirection}  humidity={humidity} visibility={visibility} windspeed={windspeed} sunrise={sunrise} sunset={sunset} feelsLike={feelsLike} pressure={pressure} />
+        <div className=' flex flex-col justify-between w-4/5 h-2/5 bg-slate-100/30 overflow-auto p-3'>
+      <Hours setVisibility={setVisibility} windDirection={windDirection}  humidity={humidity} visibility={visibility} windspeed={windspeed} sunrise={sunrise} sunset={sunset} feelsLike={feelsLike} pressure={pressure} />
         </div>
         <p className='text-blue-500 text-sm'> <i className="fa-solid fa-arrow-left"></i> scroll <i className="fa-solid fa-arrow-right"></i> </p>
 
-     <div className=' flex flex-col bg-blue-300/70 w-[100%] '>
-     <Days dailyMin={dailyMin} dailyMax={dailyMax} />
-  </div>
-
+   
   <div> 
     <h2 className='text-xl'> Change Location</h2>
     <div>

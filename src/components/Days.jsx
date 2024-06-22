@@ -46,3 +46,9 @@ export default function Days({dailyMin,dailyMax}) {
  </>
   )
 }
+
+
+
+  {/* <div className=' flex flex-col bg-blue-300/70 w-[100%] '>
+     <Days dailyMin={dailyMin} dailyMax={dailyMax} />
+  </div> */}
