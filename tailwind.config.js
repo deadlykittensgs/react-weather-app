@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       backgroundImage: {
-        'sunny-day': "url('./src/assets/clearSky.jpeg')",
+        'sunny-day': "url('/src/assets/clearSky.jpeg')",
       }
     },
   },
