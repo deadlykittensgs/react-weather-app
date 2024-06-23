@@ -186,8 +186,16 @@ setPressure(apiInformation.main.pressure)
 
 
 
+function onload() {
+  if(city === "") {
+    getLocation()
+  }
+  if(!city === "") {
+    return
+  }
+}
 
-
+onload()
 
 
 
@@ -206,11 +214,11 @@ setPressure(apiInformation.main.pressure)
 {/* body */}
     <div className='flex flex-col h-full items-center bg-sunny-day bg-cover bg-no-repeat bg-center '>
       <div className='flex flex-col items-center p-10'>
-      <h1 className='text-xl'>{city}</h1>
-        <div>{description}</div>
-        <div>{emoji}</div>
+      <h1 className='text-[3rem]'>{city}</h1>
+        <div className='text-gray-800'>{description}</div>
+        <div className='text-[2.5rem]'>{emoji}</div>
         <div className='text-[4rem]'>{weather} </div>
-        <div>{dailyMax} {dailyMin} </div>
+        <div className='flex gap-3'><div className='text-red-600'>{dailyMax}</div>  <div className='text-blue-600'>{dailyMin}</div></div>
 
       </div>
       
