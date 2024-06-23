@@ -33,6 +33,7 @@ function App() {
   const handleClick = () => {
     let locationOfSearch = inputValue.toLocaleLowerCase()
     getWeatherData(locationOfSearch)
+    setInputValue("")
   };
 
 
@@ -231,7 +232,7 @@ onload()
   <div> 
     <h2 className='text-xl'> Change Location</h2>
     <div>
-    <input id='locationInput' type="text" value={inputValue}  onChange={handleInputChange} placeholder='enter your location here'/>
+    <input id='locationInput' type="text" value={inputValue} name='town'  onChange={handleInputChange} placeholder='enter your location here'/>
     <button onClick={handleClick} className=' bg-slate-300 p-1 rounded m-2'>Search</button>
 <button onClick={getLocation} className=' bg-slate-300 p-1 rounded m-2'><i className="fa-solid fa-crosshairs"></i></button>
     </div>
