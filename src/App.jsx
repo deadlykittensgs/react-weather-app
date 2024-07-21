@@ -206,11 +206,7 @@ onload()
     // html
     <section className='w-screen h-screen'>
       {/* header section  */}
-    <header className='flex bg-blue-400 align-center justify-center p-3'>
-      
    
-      <p>Todays Weather</p>
-    </header>
 
 {/* body */}
     <div className='flex flex-col h-full items-center bg-sunny-day bg-cover bg-no-repeat bg-center '>
