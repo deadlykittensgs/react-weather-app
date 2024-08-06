@@ -219,8 +219,7 @@ onload()
 
       </div>
       
-
-        <div className=' flex flex-col justify-between w-4/5 h-2/5 bg-slate-100/30 overflow-auto p-3'>
+        <div className='w-4/5 h-2/5 bg-slate-100/30 p-3 '>
       <Stats setVisibility={setVisibility} windDirection={windDirection}  humidity={humidity} visibility={visibility} windspeed={windspeed} sunrise={sunrise} sunset={sunset} feelsLike={feelsLike} pressure={pressure} />
         </div>
 
